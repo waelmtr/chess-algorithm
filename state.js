@@ -1,6 +1,8 @@
 export class State{
-  states;
-  constructor(){}
+  
+  constructor( states = []){
+    this.states = states ;
+  }
 
   store_state(list){
     this.states = list
@@ -9,5 +11,5 @@ export class State{
   get_all_state(){
     return this.states;
   }
-
+  
 }

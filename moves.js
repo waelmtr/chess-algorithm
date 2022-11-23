@@ -8,7 +8,7 @@ export class Move {
     // curent i , j coordinates of castle
     let count = 1;
     while (this.array[i][j + count] == 1) {
-      this.array_cordinates.push({ i: i, j: j + count });
+      this.array_cordinates.push({position : {i:i , j:j+count} , path : {parent : {i:i , j:j}}});
       this.array_cordinates = this.array_cordinates;
       count++;
     }
@@ -16,7 +16,7 @@ export class Move {
   available_moves_left(i, j) {
     let count = 1;
     while (this.array[i][j - count] == 1) {
-      this.array_cordinates.push({ i: i, j: j - count });
+      this.array_cordinates.push({position : {i:i , j:j-count} , path : {parent : {i:i , j:j}}});
       this.array_cordinates = this.array_cordinates;
       count++;
     }

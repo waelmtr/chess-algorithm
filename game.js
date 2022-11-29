@@ -20,6 +20,8 @@ class Game {
     ],
     castle = array[1][1],
     king = array[9][9],
+    king_i = 9 ,
+    king_j = 9 ,
     n = 1,
     m = 1,
     k = 1,
@@ -37,6 +39,8 @@ class Game {
     this.array = array;
     this.king = king;
     this.castle = castle;
+    this.king_i = king_i;
+    this.king_j = king_j;
     this.n = n;
     this.m = m;
     this.k = k;
@@ -114,7 +118,7 @@ class Game {
   done = false;
   end = false ;
   BFS(i , j){ 
-    this.a++
+    //this.a++
     let exists = false
     while(this.array[i + 1][j] == 1){
       i = i + 1;
@@ -220,13 +224,69 @@ class Game {
       })
     }
   }
-     
-  //// UCS ALGORITHM //// 
+
+  //// UCS ALOGORITHM ////
+  done3 = false;
+  end3 = false ;
+  UCS(i , j){ 
+    let exists = false
+    while(this.array[i + 1][j] == 1){
+      i = i + 1;
+      j = j;
+    } 
+    if(this.end3 == false)
+    if(this.isEnd(i+1,j) == true){
+      this.end3 = true
+      this.done3 = true 
+      this.priorityqueue.visited_nodes.push({position :{i:i+1 , j:j}});
+      this.end_time = performance.now();
+      document.write('<strong> time taken : '+(this.end_time - this.start_time)/1000+'</strong>');
+    };
+    if(this.done3 == false)
+    if(this.isEnd(i , j) == false){
+      this.array[this.n][this.m] = this.array[i][j];
+      this.array[i][j] = this.castle;
+      this.n = i;
+      this.m = j;
+      let next_states = this.get_moves(i , j);  
+      this.priorityqueue.dequeue();
+      this.priorityqueue.visited_nodes.push({position :{i:i , j:j}})
+      next_states.forEach((element)=>{
+        exists = false
+        this.priorityqueue.visited_nodes.forEach((node)=>{
+          if(this.is_Equal(element.position , node.position)){
+            exists = true
+            return ;
+          }
+        })
+        if(exists == false){
+          this.priorityqueue.enqueue(element , 1);
+        }
+      })
+      console.log( "priority queue : " , this.priorityqueue.items)
+      console.log("visited nodes : " ,this.priorityqueue.visited_nodes)
+      this.priorityqueue.items.forEach((element)=>{
+        element = this.priorityqueue.rear();
+        exists = false
+        this.priorityqueue.visited_nodes.forEach((node)=>{
+          if(this.is_Equal(element.position , node.position)){
+            exists = true
+            return ;
+          }
+        })
+        if(exists == false){
+         //if(this.a == 1)
+         this.UCS(element.element.position.i , element.element.position.j);
+        }
+      })
+    }
+  }
+  //// A_Star ALGORITHM //// 
   a2 = 0;
   done2 = false;
   end2 = false ;
-  UCS(i , j){ 
-    this.a2++
+  A_Star(i , j){ 
+    //this.a2++
     let exists = false
     while(this.array[i + 1][j] == 1){
       i = i + 1;
@@ -236,6 +296,7 @@ class Game {
     if(this.isEnd(i+1,j) == true){
       this.end2 = true
       this.done2 = true 
+      this.priorityqueue.visited_nodes.push({position :{i:i+1 , j:j}});
       this.end_time = performance.now();
       document.write('<strong> time taken : '+(this.end_time - this.start_time)/1000+'</strong>');
     };
@@ -257,13 +318,14 @@ class Game {
           }
         })
         if(exists == false){
-           this.priorityqueue.enqueue(element , 1);
+        //  console.log(this.h(element.position.i , element.position.j))
+          this.priorityqueue.enqueue(element , this.h(element.position.i , element.position.j));
         }
       })
       console.log( "priority queue : " , this.priorityqueue.items)
       console.log("visited nodes : " ,this.priorityqueue.visited_nodes)
       this.priorityqueue.items.forEach((element)=>{
-        element = this.priorityqueue.rear();
+        element = this.priorityqueue.front();
         exists = false
         this.priorityqueue.visited_nodes.forEach((node)=>{
           if(this.is_Equal(element.position , node.position)){
@@ -272,9 +334,32 @@ class Game {
           }
         })
         if(exists == false){
-         this.UCS(element.element.position.i , element.element.position.j);
+         //if(this.a == 1)
+         this.A_Star(element.element.position.i , element.element.position.j);
         }
       })
+    }
+  }
+   
+  h(i , j){
+    let dist , x = i , y = j;
+    if (i == this.king_i ) {
+      dist = Math.sqrt(Math.pow(this.king_i - i , 2) + Math.pow(this.king_j - j , 2));
+      dist = Math.round(dist*100)/100;
+      return dist;
+    }
+    else{
+      while(this.array[x+1][y] == 2){
+       if(this.array[x+1][y+1] == 1){
+        x = x + 1 ;
+        y = y + 1 ;
+        break;
+       }
+       y++;
+      }
+     dist = Math.sqrt(Math.pow(x - i , 2) + Math.pow(y - j , 2));
+     dist = Math.round(dist*100)/100;
+      return dist;
     }
   }
 
@@ -285,8 +370,8 @@ class Game {
     this.newprint(this.array);
     this.n = row;
     this.m = col;
-    setTimeout(() => this.check_land(row, col), 500);
-    this.BFS(this.n, this.m);
+    setTimeout(() => this.check_land(this.n, this.m), 500);
+   // this.BFS(this.n, this.m);
   }
 
   newprint(M) {
@@ -316,8 +401,9 @@ class Game {
         break;
       }
     }
+    this.newprint(this.array);
     if (done == 0) {
-      this.newBFS(this.n, this.m);
+     // this.newBFS(this.n, this.m);
     }
   }
 
@@ -500,7 +586,7 @@ document.getElementById("start").addEventListener("click", () => {
 document.getElementById("BFS").addEventListener("click", () => {
   const game = new Game();
   game.start_time = performance.now();
-  game.BFS(1,1);
+  game.BFS(1,3);
 });
 document.getElementById("UCS").addEventListener("click", () => {
   const game = new Game();
@@ -512,4 +598,9 @@ document.getElementById("DFS").addEventListener("click", () => {
   game.start_time = performance.now();
   game.DFS(1,1);
 });
+document.getElementById("A_Star").addEventListener("click" , () => {
+  const game = new Game();
+  game.start_time = performance.now();
+  game.A_Star(1,1);
+})
 

@@ -410,6 +410,7 @@ class Game {
   isEnd(i, j) {
     let costs = 0;
     if (this.array[i][j] == this.king) {
+      document.write("finished ")
       return true;
     }
     return false;
